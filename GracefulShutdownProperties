@@ -1,0 +1,59 @@
+package com.tujia.os.gracefulshutdown.properties;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import static com.tujia.os.gracefulshutdown.common.Constant.*;
+
+/**
+ * @author: wenfei
+ * @date: 2018/11/16
+ * @description:
+ */
+@ConfigurationProperties(prefix = "management.gracefulshutdown")
+public class GracefulShutdownProperties { //TODO:属性值的校验逻辑移出set方法
+  private Boolean enabled;
+  /**
+   * tomcat shutdown timeout seconds,tomcat will be shutdown forceful after this time
+   * max value is 20,min value is 1
+   */
+  private long tomcatShutdownTimeout = 5L;
+
+  /**
+   * tomcat acceptor thread shutdown timeout seconds
+   * max value is 10,min value is 1
+   */
+  private long upstreamShutdownTimeout = 6L;
+
+  public long getTomcatShutdownTimeout() {
+    return tomcatShutdownTimeout;
+  }
+
+  public void setTomcatShutdownTimeout(long tomcatShutdownTimeout) {
+    this.tomcatShutdownTimeout = tomcatShutdownTimeout > MAX_TOMCAT_SHUTDOWN_SECONDS
+        ? MAX_TOMCAT_SHUTDOWN_SECONDS
+        : tomcatShutdownTimeout < MIN_TOMCAT_SHUTDOWN_SECONDS
+        ? MIN_TOMCAT_SHUTDOWN_SECONDS
+        : tomcatShutdownTimeout;
+  }
+
+  public long getUpstreamShutdownTimeout() {
+    return upstreamShutdownTimeout;
+  }
+
+  public void setUpstreamShutdownTimeout(long upstreamShutdownTimeout) {
+    this.upstreamShutdownTimeout = upstreamShutdownTimeout > MAX_TOMCAT_ACCEPTOR_SHUTDOWN_SECONDS
+        ? MAX_TOMCAT_ACCEPTOR_SHUTDOWN_SECONDS
+        : upstreamShutdownTimeout < MIN_TOMCAT_ACCEPTOR_SHUTDOWN_SECONDS
+        ? MIN_TOMCAT_ACCEPTOR_SHUTDOWN_SECONDS
+        : upstreamShutdownTimeout;
+  }
+
+  public Boolean getEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(Boolean enabled) {
+    this.enabled = enabled;
+  }
+}
