@@ -1,0 +1,48 @@
+package com.tujia.os.gracefulshutdown.ctrl;
+
+import com.tujia.os.gracefulshutdown.service.AbstractGracefulShutdownService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
+
+/**
+ * @author: wenfei
+ * @date: 2018/11/16
+ * @description:
+ */
+public class GracefulShutdownRunner<T extends AbstractGracefulShutdownService> {
+  private final Logger log = LoggerFactory.getLogger(GracefulShutdownRunner.class);
+
+  private List<T> shutdowns;
+
+  private Consumer<T> consumer;
+
+  public GracefulShutdownRunner(Consumer<T> consumer) {
+    this.consumer = consumer;
+    this.shutdowns = new ArrayList(2);
+  }
+
+  public void invoke() {
+    log.info("graceful shutdown now...");
+    Collections.sort(shutdowns);
+    Iterator<T> shutdownIterator = shutdowns.iterator();
+    while (shutdownIterator.hasNext()) {
+      T element = shutdownIterator.next();
+      consumer.accept(element);
+    }
+  }
+
+  public void register(T t) {
+    if (shutdowns.contains(t)) {
+      return;
+    }
+
+    shutdowns.add(t);
+    log.debug("register graceful shutdown runner success,{}", t.getClass());
+  }
+}
